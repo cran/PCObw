@@ -1,0 +1,224 @@
+---
+title: "PCObw"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PCObw}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: ["../inst/PCObwRef.bib", "../inst/PCObwPkg.bib"]
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(PCObw)
+```
+# Introduction
+
+When you estimate the density of a sample with a kernel density estimator (as in the density() function of package stats @R-stats) you need the crucial parameter "bw". This parameter is one of the most important for the quality of the estimator. The package PCO provides the optimal bandwidth according to the PCO criterion (for details on this criterion see @PCO19). 
+
+The package is based on a golden section search where the objective function can be the exact criterion or a binned version of the criterion. For multivariate case, the univariate golden section search has been adapted with no theoretical guarantee of convergence to the global optimum.
+
+There is no limitation on the dimension of the data. However, it is known that kernel density estimation is not
+adapted for high dimensional data. Moreover, for time and memory reasons, it is recommended to use this package with small dimensions data (lower than 10 for example).
+
+
+This package contains only two functions. 
+For univariate data, these two fuctions return the same result.
+The difference holds for multivariate data: 
+
+
+*    bw.L2PCO: searches for a full matrix
+*    bw.L2PCO.diag: searches for a diagonal matrix
+
+
+
+
+
+
+
+
+
+
+# Univariate data
+
+The input data must be a numeric vector.
+
+```{r}
+# simple example with univariate data
+data("gauss_1D_sample")
+bw.L2PCO(gauss_1D_sample)
+
+
+
+```
+
+
+## Different kernel
+
+For univariate data, it is possible to change the kernel used for the criterion computation with the "K_name" parameter.
+As default value, "K_name" is set to "gaussian" but there is two other kernels implemented : "epanechnikov" and "biweight".
+
+
+```{r}
+# simple example with epanechnikov kernel
+data("gauss_1D_sample")
+bw.L2PCO(gauss_1D_sample, K_name = "epanechnikov")
+
+# simple example with biweight kernel
+bw.L2PCO(gauss_1D_sample, K_name = "biweight")
+
+
+
+```
+
+
+
+## Optimisation parameters
+
+The optimisation is based on the algorithm of the golden section search. The search stops when one of the
+two following condition is true:
+
+*    The number of criterion evaluations is greater or equal to "nh" (default value: nh = 40)
+*    The interval of search has a length lower than the tolerance "tol" (default value: tol =  10^(-6))
+
+
+```{r}
+# example when the tolerance is not reached
+data("gauss_1D_sample")
+bw.L2PCO(gauss_1D_sample, nh = 3)
+
+bw.L2PCO(gauss_1D_sample, tol = 10^(-6))
+
+```
+
+
+## Exact or binned criterion
+
+Two ways are possible for the PCO criterion computation. 
+The exact formula is used as default. If the size of the sample is huge, 
+it is preferable to use a binned version with the option "binning = TRUE" for time computation reasons.
+
+
+
+```{r}
+# binning example
+data("gauss_1D_sample")
+bw.L2PCO(gauss_1D_sample, binning = TRUE)
+
+```
+
+
+For univariate data, the default number of bins is 32. But, as seen in the previous example, it can be too small.
+In that case, it is possible to increase the number of bins in setting the option "nb", or to set the option "adapt_nb_bin" to TRUE.
+
+```{r}
+# change the number of bins "nb"
+data("gauss_1D_sample")
+bw.L2PCO(gauss_1D_sample, binning = TRUE, nb = 130)
+
+# or use "adapt_nb_bin = TRUE"
+bw.L2PCO(gauss_1D_sample, binning = TRUE, adapt_nb_bin = TRUE)
+
+# time comparison between exact and binned criterion with an huge sample
+huge_sample <- rnorm(n = 10000, mean = 0, sd = 1)
+
+ptm0 <- proc.time()
+bw.L2PCO(huge_sample)
+proc.time() - ptm0
+
+ptm0 <- proc.time()
+bw.L2PCO(huge_sample, binning = TRUE, adapt_nb_bin = TRUE)
+proc.time() - ptm0
+
+```
+
+
+
+
+# Multivariate data
+
+The input data must be, in this case, a numeric matrix.
+The choice of the function to use is link to the output. If only a diagonal matrix is intended, then use bw.L2PCO.diag. If a full matrix is necessary, then use bw.L2PCO. Please note that the off-diagonal elements are not directly optimised, they are computed using a transformation P^(-1) * diag(H) * P, with P the matrix of the eigen decomposion of the covariance matrix of the data and diag(H) is a diagonal matrix (as described in @PCO19). 
+
+
+
+
+```{r}
+
+# example with 2D data
+data("gauss_mD_sample")
+
+# to return a full matrix
+bw.L2PCO(gauss_mD_sample)
+
+# to return a diagonal matrix
+bw.L2PCO.diag(gauss_mD_sample)
+```
+
+
+## Optimisation parameters
+
+
+
+
+The optimisation is based on the algorithm of the golden section search on each dimension. The search stops when one of the two following condition is true:
+
+*    The number of criterion evaluations is greater or equal to "nh" (default value: nh = 40)
+*    The interval of search has a length lower than the tolerance "tol" (default value: tol =  10^(-6)) on each dimension
+
+As the previous example illustrates, it can be necessary to increase the maximal number of criterion evaluations 
+for more accurate results or to increase the tolerance for faster results.  
+```{r}
+data("gauss_mD_sample")
+
+# increase the tolerance for faster results
+bw.L2PCO.diag(gauss_mD_sample, tol = 10^(-3))
+
+# increase "nh" for more accurate results
+bw.L2PCO.diag(gauss_mD_sample, nh = 80)
+
+# increase the tolerance for faster results
+bw.L2PCO(gauss_mD_sample, tol = 10^(-3))
+
+# increase "nh" for more accurate results
+bw.L2PCO(gauss_mD_sample, nh = 80)
+
+```
+
+
+
+## Exact or binned criterion
+
+As for univariate data, it is possible to use a binned version of the criterion instead of the exact formula (which is the default computation) in setting "binning" parameter to TRUE. Binning is faster when sample is huge, otherwise it can be slower.
+For multivariate data, the default number of bins is 32 on each dimension. It is possible to have a different number of bins according to the dimension. For this purpose, use nb_bin_vect parameter.
+However, contrary to 1D case, there is no check of the number of bins.
+
+
+```{r}
+data("gauss_mD_sample")
+
+# with a too small number of bins, the results are degenerated
+bw.L2PCO.diag(gauss_mD_sample, binning = TRUE, nh = 80, nb_bin_vect = c(5, 10))
+
+bw.L2PCO.diag(gauss_mD_sample, binning = TRUE, nh = 80, nb_bin_vect = c(40, 80))
+
+# with a too small number of bins, the results are degenerated
+bw.L2PCO(gauss_mD_sample, binning = TRUE, nh = 80, nb_bin_vect = c(5, 10))
+
+bw.L2PCO(gauss_mD_sample, binning = TRUE, nh = 80, nb_bin_vect = c(40, 45))
+
+
+
+
+```
+
+
+# References
+
+
