@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // h_GK_1D_exact
 double h_GK_1D_exact(Eigen::VectorXd xi, int nh_max, double tol);
 RcppExport SEXP _PCObw_h_GK_1D_exact(SEXP xiSEXP, SEXP nh_maxSEXP, SEXP tolSEXP) {

@@ -2,6 +2,5 @@
 
 export(bw.L2PCO)
 export(bw.L2PCO.diag)
-import(RcppEigen)
 importFrom(Rcpp,sourceCpp)
 useDynLib(PCObw)

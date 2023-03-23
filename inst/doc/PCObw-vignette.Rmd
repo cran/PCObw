@@ -29,7 +29,7 @@ adapted for high dimensional data. Moreover, for time and memory reasons, it is 
 
 
 This package contains only two functions. 
-For univariate data, these two fuctions return the same result.
+For univariate data, these two functions return the same result.
 The difference holds for multivariate data: 
 
 

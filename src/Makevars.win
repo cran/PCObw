@@ -1,0 +1,28 @@
+## With Rcpp 0.11.0 and later, we no longer need to set PKG_LIBS as there is
+## no user-facing library. The include path to headers is already set by R.
+#PKG_LIBS = 
+#PKG_CXXFLAGS += -g0
+#PKG_CXX11FLAGS += -g0
+#PKG_CFLAGS += -fsanitize=address
+#PKG_CXXFLAGS += -fsanitize=address
+#PKG_CXX11FLAGS += -fsanitize=address
+#PKG_CFLAGS += -fsanitize=address -static-libasan -g
+#PKG_CXXFLAGS += -fsanitize=address -static-libasan -g
+#PKG_CXX11FLAGS += -fsanitize=address -static-libasan -g
+
+## With R 3.1.0 or later, you can uncomment the following line to tell R to 
+## enable compilation with C++11 (or even C++14) where available
+#CXX_STD = CXX11
+
+
+#CFLAGS= -fsanitize=address -static-libasan -g -O3 -Wall -pedantic -fdiagnostics-color=always 
+#CXXFLAGS= -fsanitize=address -static-libasan -g -O3 -Wall -pedantic -fdiagnostics-color=always 
+#CXX11FLAGS= -fsanitize=address -static-libasan -g -O3 -Wall -pedantic -fdiagnostics-color=always 
+
+#CFLAGS += -fsanitize=address
+#CXXFLAGS += -fsanitize=address
+#CXX11FLAGS += -fsanitize=address
+
+#CFLAGS += -fsanitize=address -static-libasan -g
+#CXXFLAGS += -fsanitize=address -static-libasan -g
+#CXX11FLAGS += -fsanitize=address -static-libasan -g

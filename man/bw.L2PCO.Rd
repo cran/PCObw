@@ -4,8 +4,16 @@
 \alias{bw.L2PCO}
 \title{Compute the full PCO bandwith}
 \usage{
-bw.L2PCO(x_i, nh = 40, K_name = "gaussian", binning = FALSE,
-  nb = 32, tol = 1e-06, adapt_nb_bin = FALSE, nb_bin_vect = NULL)
+bw.L2PCO(
+  x_i,
+  nh = 40,
+  K_name = "gaussian",
+  binning = FALSE,
+  nb = 32,
+  tol = 1e-06,
+  adapt_nb_bin = FALSE,
+  nb_bin_vect = NULL
+)
 }
 \arguments{
 \item{x_i}{the observations. Must be a matrix with d column and n lines (d the dimension and n the sample size)}

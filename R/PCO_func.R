@@ -67,8 +67,6 @@
 bw.L2PCO <- function(x_i, nh = 40, K_name = 'gaussian', binning = FALSE, nb = 32, tol = 0.000001, adapt_nb_bin = FALSE, nb_bin_vect = NULL){
   
   
-  # implementer ici une serie de tests sur la forme de x_i et des parametres en
-  # general pour stopper l'execution en cas de mauvaise entree
   
   
   
@@ -290,8 +288,7 @@ bw.L2PCO <- function(x_i, nh = 40, K_name = 'gaussian', binning = FALSE, nb = 32
 bw.L2PCO.diag <- function(x_i, nh = 40, K_name = 'gaussian', binning = FALSE, nb = 32, tol = 0.000001, adapt_nb_bin = FALSE, nb_bin_vect = NULL){
   
   
-  # implementer ici une serie de tests sur la forme de x_i et des parametres en
-  # general pour stopper l'execution en cas de mauvaise entree
+  
   
   
   

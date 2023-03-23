@@ -4,7 +4,9 @@
 \name{gauss_1D_sample}
 \alias{gauss_1D_sample}
 \title{Univariate sample}
-\format{A vector with 100 rows}
+\format{
+A vector with 100 rows
+}
 \usage{
 data("gauss_1D_sample")
 }

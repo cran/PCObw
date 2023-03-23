@@ -1,13 +1,14 @@
-#include <Rcpp.h>
+//#include <Rcpp.h>
 #include <algorithm>
 #include <RcppEigen.h>
 
 
 using namespace Rcpp;
-//[[Rcpp::depends(RcppEigen)]]
+
 using Eigen::MatrixXd;
-using Eigen::Map;
+//using Eigen::Map;
 using Eigen::VectorXd;
+using Eigen::ArrayXd;
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> RowMajorMatrixXd;
 
@@ -23,7 +24,7 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> R
 class criterion_1D{
   
 public:
-  Eigen::VectorXd xi; // initialised in criterion_1D constructor
+  VectorXd xi; // initialised in criterion_1D constructor
   double hmin; // initialised in XK_exact_crit_1D constructor or XK_binned_crit_1D constructor
   
 protected:
@@ -37,14 +38,14 @@ public:
    * 
    * @param xi vector of the n observations
    */
-  criterion_1D(Eigen::VectorXd xi = Eigen::VectorXd::Zero(1)) {
+  criterion_1D(VectorXd xi = VectorXd::Zero(1)) {
     this->xi = xi;
     this->n = xi.size();
     this->n2 = n * n;
   }
   
 public:
-  virtual Eigen::VectorXd compute(Eigen::ArrayXd H) = 0;
+  virtual VectorXd compute(ArrayXd H) = 0;
   
   virtual double compute(double H) = 0;
   
@@ -55,10 +56,10 @@ public:
 
 class exact_crit_1D : public criterion_1D {
 protected :
-  Eigen::ArrayXd u;
+  ArrayXd u;
   
 public :
-  exact_crit_1D(Eigen::VectorXd xi):criterion_1D(xi){
+  exact_crit_1D(VectorXd xi):criterion_1D(xi){
     
   }
   
@@ -288,8 +289,8 @@ public:
     
     
     for (int i = 0; i < (n - 1); i++){
-      // since xi is sorted in increasing order, the elemnts of u are >=0
-      // exept near 0 because of numerical precision
+      // since xi is sorted in increasing order, the elements of u are >=0
+      // except near 0 because of numerical precision
       // and u is also already sorted in increasing order
       u = (xi.segment(i + 1, n_u).array() - xi(i)).abs();
       
@@ -325,6 +326,8 @@ public:
         
         while ((itu <  b1)&&(u_ind < u.size())){// itu is in [0; h - hmin[
           
+          // itu = u(u_ind);
+          
           // (Kh * Kh) (itu)
           z = itu * hinv;
           z2 = z * z;
@@ -338,10 +341,18 @@ public:
           
           loss(no_h) += k1 - k2_t_2;
           u_ind++;
-          itu = u(u_ind);
+          if (u_ind < u.size()){
+            itu = u(u_ind);
+          }
+          
+          
+          // Rcout << "u_ind = " << u_ind << std::endl;
+          // Rcout << "u.size() = " << u.size() << std::endl;
           
         }
         while ((itu <  b2)&&(u_ind < u.size())){// itu is in [h - hmin; h + hmin[
+          
+          // itu = u(u_ind);
           
           // (Kh * Kh) (itu)
           z = itu * hinv;
@@ -357,10 +368,15 @@ public:
           
           loss(no_h) += k1 - k2_t_2;
           u_ind++;
-          itu = u(u_ind);
+          if (u_ind < u.size()){
+            itu = u(u_ind);
+          }
+          // itu = u(u_ind);
           
         }
         while ((itu <  b3)&&(u_ind < u.size())){// itu is in [h + hmin; 2h[
+          
+          // itu = u(u_ind);
           
           // (Kh * Kh) (itu)
           z = itu * hinv;
@@ -372,7 +388,15 @@ public:
           
           loss(no_h) += k1;
           u_ind++;
-          itu = u(u_ind);
+          if (u_ind < u.size()){
+            itu = u(u_ind);
+          }
+          // itu = u(u_ind);
+          // if (u_ind >= u.size()){
+          //   Rcout << "itu = " << itu << std::endl;
+          //   //Rcout << "u.size() = " << u.size() << std::endl;
+          // }
+          
           
         }
         
@@ -442,6 +466,8 @@ public:
       
       while ((itu <  b1)&&(u_ind < u.size())){// itu is in [0; h - hmin[
         
+        // itu = u(u_ind);
+        
         // (Kh * Kh) (itu)
         z = itu * hinv;
         z2 = z * z;
@@ -455,7 +481,10 @@ public:
         
         loss += k1 - k2_t_2;
         u_ind++;
-        itu = u(u_ind);
+        // itu = u(u_ind);
+        if (u_ind < u.size()){
+          itu = u(u_ind);
+        }
         
       }
       while ((itu <  b2)&&(u_ind < u.size())){// itu is in [h - hmin; h + hmin[
@@ -474,7 +503,10 @@ public:
         
         loss += k1 - k2_t_2;
         u_ind++;
-        itu = u(u_ind);
+        // itu = u(u_ind);
+        if (u_ind < u.size()){
+          itu = u(u_ind);
+        }
         
       }
       while ((itu <  b3)&&(u_ind < u.size())){// itu is in [h + hmin; 2h[
@@ -489,7 +521,10 @@ public:
         
         loss += k1;
         u_ind++;
-        itu = u(u_ind);
+        // itu = u(u_ind);
+        if (u_ind < u.size()){
+          itu = u(u_ind);
+        }
         
       }
       
@@ -586,7 +621,11 @@ public:
           loss(no_h) += k1 - k2_t_2;
           
           u_ind++;
-          itu = u(u_ind);
+          
+          // itu = u(u_ind);
+          if (u_ind < u.size()){
+            itu = u(u_ind);
+          }
         }
         while ((itu <  b2) && (u_ind < u.size())) {// itu is in [h - hmin; h + hmin[
           z = itu * h_inv;
@@ -604,7 +643,10 @@ public:
           loss(no_h) += k1 - k2_t_2;
           
           u_ind++;
-          itu = u(u_ind);
+          // itu = u(u_ind);
+          if (u_ind < u.size()){
+            itu = u(u_ind);
+          }
         }
         while ((itu <  b3) && (u_ind < u.size())){// itu is in [h + hmin; 2 * h[
           z = itu * h_inv;
@@ -617,7 +659,10 @@ public:
           
           loss(no_h) += k1;
           u_ind++;
-          itu = u(u_ind);
+          // itu = u(u_ind);
+          if (u_ind < u.size()){
+            itu = u(u_ind);
+          }
         }
       }
       n_u -= 1;
@@ -709,7 +754,10 @@ public:
         loss += k1 - k2_t_2;
         
         u_ind++;
-        itu = u(u_ind);
+        // itu = u(u_ind);
+        if (u_ind < u.size()){
+          itu = u(u_ind);
+        }
       }
       while ((itu <  b2) && (u_ind < u.size())) {// itu is in [h - hmin; h + hmin[
         // (Kh * Kh) (itu)
@@ -728,7 +776,10 @@ public:
         loss += k1 - k2_t_2;
         
         u_ind++;
-        itu = u(u_ind);
+        // itu = u(u_ind);
+        if (u_ind < u.size()){
+          itu = u(u_ind);
+        }
       }
       while ((itu <  b3) && (u_ind < u.size())){// itu is in [h + hmin; 2 * h[
         // (Kh * Kh) (itu)
@@ -741,7 +792,10 @@ public:
         // (Kh * Khmin) (itu) = 0
         loss += k1;
         u_ind++;
-        itu = u(u_ind);
+        // itu = u(u_ind);
+        if (u_ind < u.size()){
+          itu = u(u_ind);
+        }
       }
       
       n_u -= 1;

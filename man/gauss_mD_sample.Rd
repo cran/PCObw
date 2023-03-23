@@ -4,7 +4,9 @@
 \name{gauss_mD_sample}
 \alias{gauss_mD_sample}
 \title{Multivariate sample}
-\format{A matrix with 100 rows and 2 columns}
+\format{
+A matrix with 100 rows and 2 columns
+}
 \usage{
 data("gauss_mD_sample")
 }
